@@ -4,8 +4,7 @@ primes = {}
 -- Make sure the internal table contains a prime at least as large as `n'.
 function primes.ensure(n)
 	if not LOADED then load_primes() end
-	while PRIMES[#PRIMES] < n do -- TODO: finish
-	end
+	while PRIMES[#PRIMES] < n do next_prime() end
 end
 
 -- Return all the prime factors of `n'.
@@ -36,7 +35,7 @@ local LOADED = false
 -- Did we generate any new primes during this run?
 local DIRTY = false
 
--- Load primes from primes.txt into PRIMES. Returns number of loaded primes, or 0 and error message.
+-- Load primes from PRIMES_FILE into PRIMES. Returns number of loaded primes, or 0 and error message.
 local function load_primes()
 	local f, err = io.open(PRIMES_FILE, 'r')
 	if not f then return 0, err end
@@ -49,7 +48,8 @@ end
 
 -- Store primes from PRIMES back into primes.txt
 local function store_primes()
-	local f = io.open(PRIMES_FILE, 'w')
+	local f, err = io.open(PRIMES_FILE, 'w')
+	if not f then return err end
 	for i,p in ipairs(PRIMES) do f:write(p, '\n') end
 	f:close()
 end
@@ -68,12 +68,9 @@ end
 -- Is `x' a prime?
 local function is_prime(x)
 	local vx = math.floor(math.sqrt(x))
-	local i = 1
-	-- TODO: implement correctly
 	while PRIMES[i] <= vx do
-		if is_divisor(PRIMES[i], x) then return false end
+		if x % PRIMES[i] == 0 then return false end
 		i = i + 1
-		if i > #PRIMES then next_prime() end
 	end
 	return true
 end

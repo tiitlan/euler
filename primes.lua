@@ -12,7 +12,11 @@ function primes.factorize(n)
 	local vn = math.floor(math.sqrt(n))
 	primes.ensure(vn)
 	local retval ={}
-	-- TODO: implement
+	local i = 1
+	while PRIMES[i] <= vn do
+		if n % PRIMES[i] == 0 then table.insert(retval, PRIMES[i]) end
+		i = i + 1
+	end
 	return unpack(retval)
 end
 
@@ -46,7 +50,7 @@ local function load_primes()
 	return #PRIMES
 end
 
--- Store primes from PRIMES back into primes.txt
+-- Store primes from PRIMES back into PRIMES_FILE.
 local function store_primes()
 	local f, err = io.open(PRIMES_FILE, 'w')
 	if not f then return err end
@@ -54,7 +58,7 @@ local function store_primes()
 	f:close()
 end
 
--- Find the next largest prime, store it in `PRIMES', and return.
+-- Find the next largest prime, store it in PRIMES.
 local function next_prime()
 	-- Iterate over odd numbers until we hit a prime.
 	local p = PRIMES[#PRIMES] + 2
@@ -68,6 +72,7 @@ end
 -- Is `x' a prime?
 local function is_prime(x)
 	local vx = math.floor(math.sqrt(x))
+	local i = 1
 	while PRIMES[i] <= vx do
 		if x % PRIMES[i] == 0 then return false end
 		i = i + 1

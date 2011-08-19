@@ -1,31 +1,4 @@
--- INTERFACE
 primes = {}
-
--- Make sure the internal table contains a prime at least as large as `n'.
-function primes.ensure(n)
-	if not LOADED then load_primes() end
-	while PRIMES[#PRIMES] < n do next_prime() end
-end
-
--- Return all the prime factors of `n'.
-function primes.factorize(n)
-	local vn = math.floor(math.sqrt(n))
-	primes.ensure(vn)
-	local retval ={}
-	local i = 1
-	while PRIMES[i] <= vn do
-		if n % PRIMES[i] == 0 then table.insert(retval, PRIMES[i]) end
-		i = i + 1
-	end
-	return unpack(retval)
-end
-
--- Store primes permanently.
-function primes.store()
-	if DIRTY then store_primes() end
-end
-
--- IMPLEMENTATION
 
 -- The table containing all the known primes.
 local PRIMES = {2, 3, 5, 7, 11}
@@ -58,6 +31,17 @@ local function store_primes()
 	f:close()
 end
 
+-- Is `x' a prime?
+local function is_prime(x)
+	local vx = math.floor(math.sqrt(x))
+	local i = 1
+	while PRIMES[i] <= vx do
+		if x % PRIMES[i] == 0 then return false end
+		i = i + 1
+	end
+	return true
+end
+
 -- Find the next largest prime, store it in PRIMES.
 local function next_prime()
 	-- Iterate over odd numbers until we hit a prime.
@@ -69,13 +53,26 @@ local function next_prime()
 	table.insert(PRIMES, p)
 end
 
--- Is `x' a prime?
-local function is_prime(x)
-	local vx = math.floor(math.sqrt(x))
+-- Make sure the internal table contains a prime at least as large as `n'.
+function primes.ensure(n)
+	if not LOADED then load_primes() end
+	while PRIMES[#PRIMES] < n do next_prime() end
+end
+
+-- Return all the prime factors of `n'.
+function primes.factorize(n)
+	local maxf = math.floor(n/2) -- The largest possible prime factor 
+	primes.ensure(maxf)
 	local i = 1
-	while PRIMES[i] <= vx do
-		if x % PRIMES[i] == 0 then return false end
+	local retval = {}
+	while PRIMES[i] <= maxf do
+		if n % PRIMES[i] == 0 then table.insert(retval, PRIMES[i]) end
 		i = i + 1
 	end
-	return true
+	return unpack(retval)
+end
+
+-- Store primes permanently.
+function primes.store()
+	if DIRTY then store_primes() end
 end

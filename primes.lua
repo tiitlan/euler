@@ -31,9 +31,14 @@ local function store_primes()
 	f:close()
 end
 
+-- Integer square root.
+local function isqrt(x)
+	return math.floor(math.sqrt(x))
+end
+
 -- Is `x' a prime?
 local function is_prime(x)
-	local vx = math.floor(math.sqrt(x))
+	local vx = isqrt(x)
 	local i = 1
 	while PRIMES[i] <= vx do
 		if x % PRIMES[i] == 0 then return false end
@@ -59,17 +64,25 @@ function primes.ensure(n)
 	while PRIMES[#PRIMES] < n do next_prime() end
 end
 
+-- Returns iterator that takes pairs from table t while predicate pred is true.
+local function take_while(t, pred)
+	local i = 0
+	return function ()
+		i = i + 1
+		if not pred(t[i]) or i > #t then return nil end
+		return i,t[i]
+	end
+end
+
 -- Return all the prime factors of `n'.
 function primes.factorize(n)
-	local maxf = math.floor(n/2) -- The largest possible prime factor 
-	primes.ensure(maxf)
-	local i = 1
-	local retval = {}
-	while PRIMES[i] <= maxf do
-		if n % PRIMES[i] == 0 then table.insert(retval, PRIMES[i]) end
-		i = i + 1
+	local vn = isqrt(n)
+	primes.ensure(vn)
+	for _,p in take_while(PRIMES, function(a) return a <= vn end) do
+		if n % p == 0 then return p, primes.factorize(n / p) end
 	end
-	return unpack(retval)
+	-- If we reach here, n itself is prime.
+	return n
 end
 
 -- Store primes permanently.

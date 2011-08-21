@@ -13,8 +13,21 @@ function usage()
 	os.exit(2)
 end
 
+function table.print(t)
+	local out = io.stdout
+	for i,v in ipairs(t) do
+		out:write(v, (i < #t) and ', ' or '')
+	end
+	out:write('\n')
+end
+
 -- Script BEGINS
 if #arg ~= 1 then usage() end
 local n = tonumber(arg[1], 10)
-print(primes.factorize(n))
+local factors = {primes.factorize(n)}
+if #factors == 1 then
+	print("It's a prime, silly!")
+else
+	table.print(factors)
+end
 primes.store()

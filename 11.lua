@@ -60,3 +60,13 @@ for i=1,20 do
     end
 end
 print('Row maximum: ', maxs)
+
+-- Columns
+maxs = 0
+for i=1,20 do
+    for j=1,17 do
+        local s = A[j][i]*A[j+1][i]*A[j+2][i]*A[j+3][i]
+        if s > maxs then maxs = s end
+    end
+end
+print('Column maximum: ', maxs)
